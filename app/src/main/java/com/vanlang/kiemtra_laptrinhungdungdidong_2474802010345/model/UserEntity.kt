@@ -1,0 +1,12 @@
+package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "users")
+data class UserEntity(
+    @PrimaryKey val uid: String,
+    val name: String,
+    val email: String,
+    val image: String?
+)

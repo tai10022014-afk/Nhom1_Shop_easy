@@ -1,0 +1,19 @@
+# IDE
+/.idea/
+*.iml
+.DS_Store
+
+# Build output (bắt buộc xóa trước khi nén zip: Build > Clean Project)
+/build
+**/build/
+/captures
+.gradle
+.kotlin/
+.externalNativeBuild
+.cxx
+
+# Máy cá nhân + bí mật ký ứng dụng
+local.properties
+keystore.properties
+*.jks
+*.keystore
