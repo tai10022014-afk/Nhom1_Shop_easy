@@ -33,6 +33,13 @@ class LoginActivity : AppCompatActivity() {
             )
         }
 
+        binding.btnRegister.setOnClickListener {
+            viewModel.register(
+                binding.edtEmail.text.toString(),
+                binding.edtPassword.text.toString()
+            )
+        }
+
         binding.btnLoadUsers.setOnClickListener {
             userViewModel.loadUsers()
         }

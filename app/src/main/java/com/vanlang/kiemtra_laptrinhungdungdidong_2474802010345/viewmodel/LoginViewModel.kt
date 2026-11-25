@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = AuthRepository(
-        AppDatabase.getInstance(application).userDao()
+        userDao = AppDatabase.getInstance(application).userDao()
     )
 
     private val _loginState = MutableLiveData<LoginState>()
@@ -30,26 +30,56 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun validateInput(email: String, password: String): String? {
+        return when {
+            email.isEmpty() && password.isEmpty() -> "Lỗi: Vui lòng nhập Email và Mật khẩu!"
+            email.isEmpty() -> "Lỗi: Email không được để trống!"
+            password.isEmpty() -> "Lỗi: Mật khẩu không được để trống!"
+            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Lỗi: Email sai định dạng!"
+            password.length < 6 -> "Lỗi: Mật khẩu phải có ít nhất 6 ký tự!"
+            else -> null
+        }
+    }
+
     fun login(rawEmail: String, password: String) {
         val email = rawEmail.trim()
+        val errorMsg = validateInput(email, password)
+        if (errorMsg != null) {
+            _loginState.value = LoginState(message = errorMsg, isSuccess = false)
+            return
+        }
 
         viewModelScope.launch {
-            _loginState.value = when {
-                email.isEmpty() && password.isEmpty() ->
-                    LoginState("Lỗi: Vui lòng nhập Email và Mật khẩu!", false)
-                email.isEmpty() ->
-                    LoginState("Lỗi: Email không được để trống!", false)
-                password.isEmpty() ->
-                    LoginState("Lỗi: Mật khẩu không được để trống!", false)
-                !Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
-                    LoginState("Lỗi: Email sai định dạng!", false)
-                password.length < 6 ->
-                    LoginState("Lỗi: Mật khẩu phải có ít nhất 6 ký tự!", false)
-                repository.authenticate(email, password) ->
-                    LoginState("Xác thực thành công!", true)
-                else ->
-                    LoginState("Lỗi: Sai email hoặc mật khẩu!", false)
-            }
+            val result = repository.loginWithFirebase(email, password)
+            _loginState.value = result.fold(
+                onSuccess = {
+                    LoginState(message = "Đăng nhập thành công!", isSuccess = true)
+                },
+                onFailure = { e ->
+                    LoginState(message = "Đăng nhập thất bại: ${e.localizedMessage}", isSuccess = false)
+                }
+            )
+        }
+    }
+
+    fun register(rawEmail: String, password: String) {
+        val email = rawEmail.trim()
+        val errorMsg = validateInput(email, password)
+        if (errorMsg != null) {
+            _loginState.value = LoginState(message = errorMsg, isSuccess = false)
+            return
+        }
+
+        viewModelScope.launch {
+            val result = repository.registerWithFirebase(email, password)
+            _loginState.value = result.fold(
+                onSuccess = {
+                    LoginState(message = "Đăng ký thành công!", isSuccess = true)
+                },
+                onFailure = { e ->
+                    LoginState(message = "Đăng ký thất bại: ${e.localizedMessage}", isSuccess = false)
+                }
+            )
         }
     }
 }

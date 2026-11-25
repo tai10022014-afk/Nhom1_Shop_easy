@@ -1,6 +1,7 @@
 plugins {
     id("com.google.devtools.ksp")
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -49,6 +50,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    implementation("io.coil-kt:coil:2.7.0")
 
     // THÊM MỚI: LiveData cho ViewModel
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")

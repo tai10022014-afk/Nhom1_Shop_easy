@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "474796562045",
+    "project_id": "shopeasy-60c5e",
+    "storage_bucket": "shopeasy-60c5e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:474796562045:android:cafc62a91b34f257e6c314",
+        "android_client_info": {
+          "package_name": "com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJwTsbSdsIRzft38BY-4GMO8doHOxAeMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
