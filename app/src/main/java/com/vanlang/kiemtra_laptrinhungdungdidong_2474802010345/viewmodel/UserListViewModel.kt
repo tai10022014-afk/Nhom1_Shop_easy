@@ -1,25 +1,30 @@
 package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.database.AppDatabase
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.Resource
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserDto
+import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserEntity
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.repository.UserRepository
 import kotlinx.coroutines.launch
 
-class UserListViewModel(
-    private val repository: UserRepository = UserRepository()
-) : ViewModel() {
+class UserListViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _users = MutableLiveData<Resource<List<UserDto>>>()
-    val users: LiveData<Resource<List<UserDto>>> = _users
+    private val repository = UserRepository(AppDatabase.getInstance(application))
+
+    val users: LiveData<List<UserEntity>> = repository.users.asLiveData()
+
+    private val _status = MutableLiveData<Resource<Unit>>()
+    val status: LiveData<Resource<Unit>> = _status
 
     fun loadUsers() {
-        _users.value = Resource.Loading
+        _status.value = Resource.Loading
         viewModelScope.launch {
-            _users.value = repository.fetchUsers()
+            _status.value = repository.refresh()
         }
     }
 }

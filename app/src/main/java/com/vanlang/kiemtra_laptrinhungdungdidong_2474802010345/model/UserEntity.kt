@@ -1,15 +1,12 @@
 package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model
 
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(
-    tableName = "users",
-    indices = [Index(value = ["email"], unique = true)]
-)
+@Entity(tableName = "users")
 data class UserEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val uid: String,
+    val name: String,
     val email: String,
-    val password: String
+    val image: String?
 )

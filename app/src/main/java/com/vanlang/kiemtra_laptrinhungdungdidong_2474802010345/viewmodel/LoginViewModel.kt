@@ -5,30 +5,17 @@ import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.database.AppDatabase
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.LoginState
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserEntity
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = AuthRepository(
-        userDao = AppDatabase.getInstance(application).userDao()
-    )
+    private val repository = AuthRepository()
 
     private val _loginState = MutableLiveData<LoginState>()
     val loginState: LiveData<LoginState> = _loginState
-
-    val users: LiveData<List<UserEntity>> = repository.users.asLiveData()
-
-    init {
-        viewModelScope.launch {
-            repository.seedDefaultUser()
-        }
-    }
 
     private fun validateInput(email: String, password: String): String? {
         return when {

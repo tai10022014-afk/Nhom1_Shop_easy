@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(user: UserEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(users: List<UserEntity>)
 
-    @Query("SELECT * FROM users")
+    @Query("DELETE FROM users")
+    suspend fun clear()
+
+    @Query("SELECT * FROM users ORDER BY name COLLATE NOCASE")
     fun getAllUsers(): Flow<List<UserEntity>>
-
-    @Query("SELECT * FROM users WHERE email = :email AND password = :password LIMIT 1")
-    suspend fun findUser(email: String, password: String): UserEntity?
 }

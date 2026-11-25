@@ -1,22 +1,23 @@
 package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.repository
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.database.UserDao
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserEntity
-import kotlinx.coroutines.flow.Flow
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository(
-    private val userDao: UserDao,
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-    val users: Flow<List<UserEntity>> = userDao.getAllUsers()
 
     suspend fun loginWithFirebase(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.signInWithEmailAndPassword(email.trim(), password).await()
-            val user = result.user ?: return Result.failure(Exception("Không lấy được thông tin tài khoản"))
+            val user = result.user
+                ?: return Result.failure(Exception("Không lấy được thông tin tài khoản"))
+            saveProfile(user, email.trim())
             Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
@@ -26,10 +27,28 @@ class AuthRepository(
     suspend fun registerWithFirebase(email: String, password: String): Result<FirebaseUser> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email.trim(), password).await()
-            val user = result.user ?: return Result.failure(Exception("Không tạo được tài khoản"))
+            val user = result.user
+                ?: return Result.failure(Exception("Không tạo được tài khoản"))
+            saveProfile(user, email.trim())
             Result.success(user)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    private suspend fun saveProfile(user: FirebaseUser, email: String) {
+        try {
+            val name = email.substringBefore("@")
+            val profile = mapOf(
+                "uid" to user.uid,
+                "email" to email,
+                "name" to name,
+                "photoUrl" to "https://ui-avatars.com/api/?name=${Uri.encode(name)}&size=128&background=random"
+            )
+            firestore.collection("users").document(user.uid)
+                .set(profile, SetOptions.merge())
+                .await()
+        } catch (_: Exception) {
         }
     }
 
@@ -37,14 +56,5 @@ class AuthRepository(
 
     fun signOut() {
         auth.signOut()
-    }
-
-    // Giữ lại nếu chỗ khác đang gọi
-    suspend fun authenticate(email: String, password: String): Boolean {
-        return userDao.findUser(email, password) != null
-    }
-
-    suspend fun seedDefaultUser() {
-        userDao.insert(UserEntity(email = "a@gmail.com", password = "123456"))
     }
 }

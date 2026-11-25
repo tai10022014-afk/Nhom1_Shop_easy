@@ -27,19 +27,11 @@ class LoginActivity : AppCompatActivity() {
         binding.rvUsers.adapter = userAdapter
 
         binding.btnLogin.setOnClickListener {
-            viewModel.login(
-                binding.edtEmail.text.toString(),
-                binding.edtPassword.text.toString()
-            )
+            viewModel.login(binding.edtEmail.text.toString(), binding.edtPassword.text.toString())
         }
-
         binding.btnRegister.setOnClickListener {
-            viewModel.register(
-                binding.edtEmail.text.toString(),
-                binding.edtPassword.text.toString()
-            )
+            viewModel.register(binding.edtEmail.text.toString(), binding.edtPassword.text.toString())
         }
-
         binding.btnLoadUsers.setOnClickListener {
             userViewModel.loadUsers()
         }
@@ -50,22 +42,25 @@ class LoginActivity : AppCompatActivity() {
             binding.tvStatus.text = state.message
         }
 
-        userViewModel.users.observe(this) { resource ->
+        // Danh sách luôn lấy từ Room
+        userViewModel.users.observe(this) { list ->
+            binding.rvUsers.visibility = View.VISIBLE
+            userAdapter.submitList(list)
+        }
+
+        // Trạng thái tải từ Firestore
+        userViewModel.status.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
-                    binding.rvUsers.visibility = View.GONE
                     binding.tvError.visibility = View.GONE
                 }
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.tvError.visibility = View.GONE
-                    binding.rvUsers.visibility = View.VISIBLE
-                    userAdapter.submitList(resource.data)
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    binding.rvUsers.visibility = View.GONE
                     binding.tvError.visibility = View.VISIBLE
                     binding.tvError.text = resource.message
                 }

@@ -2,42 +2,42 @@ package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.R
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.databinding.ItemUserBinding
-import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserDto
+import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserEntity
 
-class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
-
-    private var items: List<UserDto> = emptyList()
-
-    fun submitList(newList: List<UserDto>) {
-        items = newList
-        notifyDataSetChanged()
-    }
+class UserAdapter : ListAdapter<UserEntity, UserAdapter.UserViewHolder>(DIFF) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
-        val binding = ItemUserBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return UserViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        val user = items[position]
-        holder.binding.tvName.text = "${user.firstName} ${user.lastName}"
-        holder.binding.tvEmail.text = user.email
-        holder.binding.imgAvatar.load(user.image) {
-            placeholder(R.mipmap.ic_launcher)
-            error(R.mipmap.ic_launcher)
+        holder.bind(getItem(position))
+    }
+
+    class UserViewHolder(private val binding: ItemUserBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(user: UserEntity) {
+            binding.tvName.text = user.name
+            binding.tvEmail.text = user.email
+            binding.imgAvatar.load(user.image) {
+                placeholder(R.mipmap.ic_launcher)
+                error(R.mipmap.ic_launcher)
+            }
         }
     }
 
-    override fun getItemCount(): Int = items.size
-
-    class UserViewHolder(val binding: ItemUserBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    private companion object {
+        val DIFF = object : DiffUtil.ItemCallback<UserEntity>() {
+            override fun areItemsTheSame(a: UserEntity, b: UserEntity) = a.uid == b.uid
+            override fun areContentsTheSame(a: UserEntity, b: UserEntity) = a == b
+        }
+    }
 }
