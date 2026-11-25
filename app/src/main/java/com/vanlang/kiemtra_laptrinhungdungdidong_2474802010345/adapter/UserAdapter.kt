@@ -3,6 +3,8 @@ package com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.R
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.databinding.ItemUserBinding
 import com.vanlang.kiemtra_laptrinhungdungdidong_2474802010345.model.UserDto
 
@@ -17,7 +19,9 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = ItemUserBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
         return UserViewHolder(binding)
     }
@@ -26,6 +30,10 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
         val user = items[position]
         holder.binding.tvName.text = "${user.firstName} ${user.lastName}"
         holder.binding.tvEmail.text = user.email
+        holder.binding.imgAvatar.load(user.image) {
+            placeholder(R.mipmap.ic_launcher)
+            error(R.mipmap.ic_launcher)
+        }
     }
 
     override fun getItemCount(): Int = items.size
